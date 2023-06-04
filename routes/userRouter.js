@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { signUp, logIn } = require("./controllers/userController");
+const { signUp, logIn } = require("../controllers/userController");
 const {
-  validateBody,
-  signUpSchema,
   passwordsMatch,
   isNewUser,
   hashPwd,
@@ -15,20 +13,18 @@ const {
 // Route handler for user registration
 router.post(
   "/signup",
-  validateBody(signUpSchema),
   passwordsMatch,
   isNewUser,
   hashPwd,
-  UsersController.signUp
+  signUp
 );
 
 // Route handler for user login
 router.post(
   "/login",
-  validateBody(loginSchema),
   doesUserExist,
   verifyPassword,
-  UsersController.logIn
+  logIn
 );
 
 // Route handler for retrieving user high scores
@@ -36,7 +32,4 @@ router.get("/:userId/scores", );
   // Retrieve user high scores from the database or any other data source
   // and send the response back to the client
 
-
-// Other user-related route handlers and logic
-
-module.exports = userRouter;
+module.exports = router;
