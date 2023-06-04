@@ -1,31 +1,16 @@
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const Ajv = require("ajv");
-const ajv = new Ajv();
-const validate = ajv.compile(schema);
-const valid = validate(data);
-if (!valid) console.log(validate.errors);
-const Ajv = require("ajv");
-const addFormats = require("ajv-formats");
-addFormats(ajv);
+const userSchema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+  isAdmin: Boolean,
+});
 
-const signupSchema = {
-  type: "object",
-  properties: {
-    userName: { type: "string", minLength: 2 },
-    email: { type: "string", format: "email" },
-    password: { type: "string", format: "password" },
-    repassword: { type: "string", format: "password" },
-  },
-  required: ["userName", "email", "password"],
-  additionalProperties: true,
-};
+const User = mongoose.model("User", userSchema, {
+  collection: "galaxy-smashers",
+});
 
-const loginSchema = {
-  type: "object",
-  properties: {
-    email: { type: "string", format: "email" },
-    password: { type: "string", format: "password" },
-  },
-  required: ["email", "password"],
-  additionalProperties: true,
-};
+module.exports = User;
