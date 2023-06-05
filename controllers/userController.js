@@ -2,10 +2,15 @@ const User = require("../models/userModels");
 
 exports.signUp = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    const newUser = new User({ email, password, name });
+    const { email, password, firstName } = req.body;
+    const newUser = new User({ email, password, firstName });
     const savedUser = await newUser.save();
-    res.send({ userId: savedUser._id, email, name });
+    res.status(201).send({
+      message: "User created successfully",
+      userId: savedUser._id,
+      email,
+      firstName,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });
@@ -21,7 +26,7 @@ exports.logIn = async (req, res) => {
       sameSite: "none",
       secure: true,
     });
-    res.send({ name: user.name, id: user.id });
+    res.status(200).send({ name: user.firstName });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -48,4 +53,3 @@ exports.getPlayerById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch player" });
   }
 };
-

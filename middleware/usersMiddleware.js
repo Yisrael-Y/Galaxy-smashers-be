@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModels");
 const jwtSecret = process.env.TOKEN_KEY;
 
-
 function passwordsMatch(req, res, next) {
   if (req.body.password !== req.body.repassword) {
     return res.status(400).send("Passwords don't match");
@@ -24,7 +23,6 @@ async function isNewUser(req, res, next) {
   }
 }
 
-
 function hashPwd(req, res, next) {
   const saltRounds = 10;
   bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
@@ -38,6 +36,7 @@ function hashPwd(req, res, next) {
 
 async function doesUserExist(req, res, next) {
   try {
+    const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send("User with this email does not exist");
