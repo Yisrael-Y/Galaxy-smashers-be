@@ -20,6 +20,8 @@ app.use(cookieParser());
 // Routes
 const userRouter = require("./routes/userRouter");
 app.use("/users", userRouter);
+const gameRouter = require("./routes/gameRouter");
+app.use("/game", gameRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
