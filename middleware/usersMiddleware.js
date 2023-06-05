@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModels");
 const jwtSecret = process.env.TOKEN_KEY;
+
 
 function passwordsMatch(req, res, next) {
   if (req.body.password !== req.body.repassword) {
@@ -11,7 +13,8 @@ function passwordsMatch(req, res, next) {
 
 async function isNewUser(req, res, next) {
   try {
-    const user = await getUserByEmailModel(req.body.email);
+    const { email } = req.body;
+    const user = await User.findOne({ email });
     if (user) {
       return res.status(400).send("User already exists");
     }
@@ -20,6 +23,7 @@ async function isNewUser(req, res, next) {
     return res.status(500).send(err.message);
   }
 }
+
 
 function hashPwd(req, res, next) {
   const saltRounds = 10;
@@ -34,7 +38,7 @@ function hashPwd(req, res, next) {
 
 async function doesUserExist(req, res, next) {
   try {
-    const user = await getUserByEmailModel(req.body.email);
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send("User with this email does not exist");
     }
