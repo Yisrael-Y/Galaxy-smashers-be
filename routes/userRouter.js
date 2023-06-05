@@ -30,4 +30,5 @@ router.get("/player/:id", auth, getPlayerById);
 // Route handler for retrieving user high scores
 router.get("/player:userId/scores");
 
+
 module.exports = router;

@@ -8,7 +8,12 @@ const mongoose = require("mongoose");
 const dbUrl = process.env.MONGO_URI;
 
 // Middleware
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -21,7 +26,7 @@ app.use("/game", gameRouter);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.log(`ERROR => ${err}`);
-  res.send(err); 
+  res.send(err);
 });
 
 // Start the server
