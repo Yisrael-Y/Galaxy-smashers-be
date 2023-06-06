@@ -20,7 +20,12 @@ exports.signUp = async (req, res) => {
     newUser.token = token;
     const savedUser = await newUser.save();
 
-    res.send({ userId: savedUser._id, email, firstName, lastName });
+    res.status(201).send({
+      message: "User created successfully",
+      userId: savedUser._id,
+      email,
+      firstName,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });
@@ -45,6 +50,13 @@ exports.logIn = async (req, res) => {
       user.token = token;
 
       // Set the token as a cookie in the response
+//           const { user, token } = req.body;
+//     res.cookie("token", token, {
+//       maxAge: 900000,
+//       httpOnly: true,
+//       sameSite: "none",
+//       secure: true,
+//     });
       res.cookie('token', token, {
         maxAge: 12 * 60 * 60 * 1000, // 12 hours in milliseconds
         httpOnly: true,
@@ -83,4 +95,3 @@ exports.getPlayerById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch player" });
   }
 };
-

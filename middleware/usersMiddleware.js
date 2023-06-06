@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModels");
 const jwtSecret = process.env.TOKEN_KEY;
 
-
 function passwordsMatch(req, res, next) {
   if (req.body.password !== req.body.repassword) {
     return res.status(400).send("Passwords don't match");
@@ -23,7 +22,6 @@ async function isNewUser(req, res, next) {
     return res.status(500).send(err.message);
   }
 }
-
 
 function hashPwd(req, res, next) {
   const saltRounds = 10;
