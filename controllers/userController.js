@@ -2,14 +2,15 @@ const User = require("../models/userModels");
 
 exports.signUp = async (req, res) => {
   try {
-    const { email, password, firstName } = req.body;
-    const newUser = new User({ email, password, firstName });
+    const { email, password, firstName, nickname } = req.body;
+    const newUser = new User({ email, password, firstName, nickname });
     const savedUser = await newUser.save();
     res.status(201).send({
       message: "User created successfully",
       userId: savedUser._id,
       email,
       firstName,
+      nickname,
     });
   } catch (err) {
     console.log(err);
@@ -26,7 +27,14 @@ exports.logIn = async (req, res) => {
       sameSite: "none",
       secure: true,
     });
-    res.status(200).send({ name: user.firstName });
+    const data = {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      id: user._id,
+      nickname: user.nickname,
+    };
+    res.status(200).send({ ...data });
   } catch (err) {
     res.status(500).send(err);
   }

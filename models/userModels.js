@@ -6,6 +6,7 @@ const userSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   date: { type: Date, default: Date.now },
+  nickname: { type: String, required: true },
   isAdmin: Boolean,
 });
 
