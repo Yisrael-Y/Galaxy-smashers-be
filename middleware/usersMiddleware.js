@@ -38,6 +38,7 @@ function hashPwd(req, res, next) {
 
 async function doesUserExist(req, res, next) {
   try {
+    const { email } = req.body
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send("User with this email does not exist");

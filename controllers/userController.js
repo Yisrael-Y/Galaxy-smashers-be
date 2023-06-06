@@ -1,27 +1,62 @@
 const User = require("../models/userModels");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 
 exports.signUp = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    const newUser = new User({ email, password, name });
+    const { email, password, firstName, lastName } = req.body;
+    const newUser = new User({ email, password, firstName, lastName });
+
+    // Create token
+    const token = jwt.sign(
+      { user_id: newUser._id, email },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
+
+    newUser.token = token;
     const savedUser = await newUser.save();
-    res.send({ userId: savedUser._id, email, name });
+
+    res.send({ userId: savedUser._id, email, firstName, lastName });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });
   }
 };
 
+
 exports.logIn = async (req, res) => {
   try {
-    const { user, token } = req.body;
-    res.cookie("token", token, {
-      maxAge: 900000,
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
-    res.send({ name: user.name, id: user.id });
+    const { email, password, user } = req.body;
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Create token
+      const token = jwt.sign(
+        { user_id: user._id, email },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: '2h',
+        }
+      );
+
+      // Save user token
+      user.token = token;
+
+      // Set the token as a cookie in the response
+      res.cookie('token', token, {
+        maxAge: 12 * 60 * 60 * 1000, // 12 hours in milliseconds
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      // Send the user as a JSON response
+      res.status(200).json(user);
+    } else {
+      res.status(401).send('Invalid email or password');
+    }
   } catch (err) {
     res.status(500).send(err);
   }
