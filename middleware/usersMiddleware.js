@@ -36,7 +36,7 @@ function hashPwd(req, res, next) {
 
 async function doesUserExist(req, res, next) {
   try {
-    const { email } = req.body
+    const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send("User with this email does not exist");
@@ -68,10 +68,10 @@ async function verifyPassword(req, res, next) {
 }
 
 function auth(req, res, next) {
-  if (!req.headers.authorization) {
+  if (!req.headers.cookie) {
     return res.status(401).send("Missing token");
   }
-  const token = req.headers.authorization.replace("Bearer ", "");
+  const token = req.headers.cookie.split("=")[1];
   jwt.verify(token, jwtSecret, (err, decoded) => {
     if (err) {
       return res.status(401).send("Invalid Token");
