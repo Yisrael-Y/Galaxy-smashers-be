@@ -1,7 +1,30 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const User = require("../models/userModels");
 const jwtSecret = process.env.TOKEN_KEY;
+
+cloudinary.config({
+  cloud_name: "dqy0kss8b",
+  api_key: "177599771816185",
+  api_secret: "axM6WCs_c-qDsdV3YYJpMd338B0",
+});
+
+const cloudStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage: cloudStorage });
 
 function passwordsMatch(req, res, next) {
   if (req.body.password !== req.body.repassword) {
@@ -118,4 +141,5 @@ module.exports = {
   auth,
   verifyToken,
   isAdmin,
+  upload
 };
