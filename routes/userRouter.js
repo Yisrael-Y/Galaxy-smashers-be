@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   signUp,
   logIn,
+  logOut,
   getAllPlayers,
   getPlayerById,
   getUserByToken,
@@ -23,6 +24,9 @@ router.post("/signup", passwordsMatch, isNewUser, hashPwd, signUp);
 
 // Route handler for user login
 router.post("/login", doesUserExist, verifyPassword, logIn);
+
+// Route handler for user logout
+router.get("/logout", logOut);
 
 // Player routes
 router.get("/players", getAllPlayers);

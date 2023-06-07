@@ -8,7 +8,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   date: { type: Date, default: Date.now },
   nickname: { type: String, required: true },
-  isAdmin: Boolean,
+  isAdmin: { type: Boolean, default: false },
 });
 
 const User = mongoose.model("User", userSchema);
