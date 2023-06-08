@@ -141,5 +141,5 @@ module.exports = {
   auth,
   verifyToken,
   isAdmin,
-  upload
+  upload,
 };

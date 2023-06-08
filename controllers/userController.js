@@ -60,7 +60,7 @@ exports.logOut = async (req, res) => {
     .json({ success: true, message: "User logged out successfully" });
 };
 
-exports.updateUser = async(req, res) => {
+exports.updateUser = async (req, res) => {
   try {
     const { userId } = req.body;
     const { username, email } = req.body;
@@ -87,7 +87,7 @@ exports.updateUser = async(req, res) => {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
 
 exports.getAllPlayers = async (req, res) => {
   try {
@@ -146,5 +146,24 @@ exports.editUser = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.incrementWin = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!user.gamesWon) {
+      user.gamesWon = 0;
+    }
+    user.gamesWon += 1;
+    await user.save();
+    res.json({ message: "User's win count incremented successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };

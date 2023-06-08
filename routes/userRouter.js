@@ -10,6 +10,7 @@ const {
   getPlayerById,
   getUserByToken,
   editUser,
+  incrementWin,
 } = require("../controllers/userController");
 // Import user middleware
 const {
@@ -19,8 +20,10 @@ const {
   doesUserExist,
   verifyPassword,
   auth,
-  upload
+  upload,
+  verifyToken,
 } = require("../middleware/usersMiddleware");
+const { get } = require("http");
 
 // Route handler for user registration
 router.post("/signup", passwordsMatch, isNewUser, hashPwd, signUp);
@@ -38,9 +41,10 @@ router.put("/update", auth, upload.single("picture"), updateUser);
 router.get("/players", getAllPlayers);
 router.get("/player/:id", auth, getPlayerById);
 router.get("/player/", auth, getUserByToken);
-router.put("/update", auth, editUser);
+router.put("/updateUser", auth, editUser);
+router.get("/incrementWin", verifyToken, incrementWin);
 
 // Route handler for retrieving user high scores
-router.get("/player:userId/scores");
+router.get("/leaderboard", getAllPlayers);
 
 module.exports = router;
