@@ -60,6 +60,35 @@ exports.logOut = async (req, res) => {
     .json({ success: true, message: "User logged out successfully" });
 };
 
+exports.updateUser = async(req, res) => {
+  try {
+    const { userId } = req.body;
+    const { username, email } = req.body;
+
+    let updateFields = { username, email };
+
+    if (req.file) {
+      // If a new image is uploaded
+      updateFields.profileImage = req.file.path;
+    }
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Send the updated user as a response
+    res.json(updatedUser);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 exports.getAllPlayers = async (req, res) => {
   try {
     const players = await User.find();

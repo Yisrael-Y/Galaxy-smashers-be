@@ -5,6 +5,7 @@ const {
   signUp,
   logIn,
   logOut,
+  updateUser,
   getAllPlayers,
   getPlayerById,
   getUserByToken,
@@ -18,6 +19,7 @@ const {
   doesUserExist,
   verifyPassword,
   auth,
+  upload
 } = require("../middleware/usersMiddleware");
 
 // Route handler for user registration
@@ -28,6 +30,9 @@ router.post("/login", doesUserExist, verifyPassword, logIn);
 
 // Route handler for user logout
 router.get("/logout", logOut);
+
+// Route handler for user update
+router.put("/update", auth, upload.single("picture"), updateUser);
 
 // Player routes
 router.get("/players", getAllPlayers);
