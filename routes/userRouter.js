@@ -8,6 +8,7 @@ const {
   getAllPlayers,
   getPlayerById,
   getUserByToken,
+  editUser,
 } = require("../controllers/userController");
 // Import user middleware
 const {
@@ -32,6 +33,7 @@ router.get("/logout", logOut);
 router.get("/players", getAllPlayers);
 router.get("/player/:id", auth, getPlayerById);
 router.get("/player/", auth, getUserByToken);
+router.put("/update", auth, editUser);
 
 // Route handler for retrieving user high scores
 router.get("/player:userId/scores");

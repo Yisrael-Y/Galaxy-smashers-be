@@ -4,8 +4,14 @@ const bcrypt = require("bcrypt");
 
 exports.signUp = async (req, res) => {
   try {
-    const { email, password, firstName, nickname } = req.body;
-    const newUser = new User({ email, password, firstName, nickname });
+    const { email, password, firstName, nickname, lastName } = req.body;
+    const newUser = new User({
+      email,
+      password,
+      firstName,
+      lastName,
+      nickname,
+    });
     const savedUser = await newUser.save();
 
     res.status(201).send({
@@ -88,5 +94,28 @@ exports.getUserByToken = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.editUser = async (req, res) => {
+  const { userId, email, firstName, lastName, phone, bio } = req.body;
+  const fieldsToUpdate = {
+    ...(email && { email }),
+    ...(firstName && { firstName }),
+    ...(lastName && { lastName }),
+    ...(phone && { phone }),
+    ...(bio && { bio }),
+  };
+  try {
+    const user = await User.findByIdAndUpdate(userId, fieldsToUpdate, {
+      new: true,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ message: "User edited successfully", user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
