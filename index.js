@@ -1,23 +1,19 @@
-const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 8080;
-require("dotenv").config();
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const mongoose = require("mongoose");
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "*",
-  },
+const { host, port, dbUrl, corsOptions } = require('./config');
+const app = require('express')();
+const mongoose = require('mongoose');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: corsOptions,
 });
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
-const dbUrl = process.env.MONGO_URI;
+const routes = require('./routes');
 
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: corsOptions.origin,
     credentials: true,
   })
 );
@@ -25,59 +21,62 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-const userRouter = require("./routes/userRouter");
-app.use("/users", userRouter);
-const gameRouter = require("./routes/gameRouter");
-app.use("/game", gameRouter);
+app.use('/', routes);
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
   console.log(`ERROR => ${err}`);
   res.send(err);
 });
 
-io.on("connection", (socket) => {
-  console.log(`client ${socket.id}  connected.`);
+const room = {};
+io.on('connection', (socket) => {
+  console.log(`[connected] Client id: ${socket.id}`);
   try {
-    socket.emit("enter", "Welcome! You are connected.");
-    socket.on("test", (data) => {
-      console.log(data);
+    socket.on('join', (data) => {
+      room[socket.id] = data;
+      socket.join(room);
+
+      console.log(`[join] Client id: ${socket.id} joined room ${room}`);
+    });
+
+    // Handle chat event
+    socket.on('chat', (chatMsg) => {
+      console.log('chat', chatMsg);
+      console.log(socket.handshake.query);
+      io.emit('chat', chatMsg);
+    });
+
+    // Handle typing event
+    socket.on('typing', (data) => {
+      socket.broadcast.emit('typing', data);
     });
   } catch (error) {
     console.error(error);
   }
-  socket.on("disconnect", () => {
-    console.log(`client ${socket.id}  disconnected.`);
+  socket.on('disconnect', () => {
+    Object.keys(room).find((key) => {
+      room[key] === socket.id && delete room[key];
+    });
+
+    console.log(`[disconnected] Client id: ${socket.id}`);
   });
 });
 
-const pollingInterval = 30 * 1000; // 5 seconds
-
-const initSocket = (io) => {
-  const interval = setInterval(() => {
-    console.log("*** Test emitted! ***");
-    io.emit("test", "Testing socket");
-  }, pollingInterval);
-};
-
-initSocket(io);
-
 // Start the server
-async function init() {
+(async function init() {
   try {
     const connection = await mongoose.connect(dbUrl, {
-      dbName: "galaxy-smashers",
+      dbName: 'galaxy-smashers',
     });
     if (connection.connections[0].host) {
-      console.log("Connected to DB");
-      server.listen(PORT, () => {
-        console.log("Listening on port " + PORT);
+      console.log('Connected to DB');
+      server.listen(port, () => {
+        console.log('Listening on port ' + port);
       });
     }
   } catch (err) {
     console.log(err);
     process.exit(1);
   }
-}
-
-init();
+})();
